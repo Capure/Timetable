@@ -40,6 +40,6 @@ const Wrapper = styled.div<Settings>`
     width: 250px;
     font-size: 22px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
 `;
