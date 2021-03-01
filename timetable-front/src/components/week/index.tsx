@@ -1,4 +1,4 @@
-import {useContext, useState} from 'react';
+import {useContext, useState, useEffect} from 'react';
 import { SettingsContext } from '../shared/SettingsProvider';
 import styled from 'styled-components';
 import {Footer} from '../shared/Footer';
@@ -16,7 +16,16 @@ const WeekPage = (props: any) => {
     const settings = useContext(SettingsContext);
     const {isLoading, error, data} = useQuery('week', () => getLessonsForTheWeek(settings));
     const [currentDay, setCurrentDay] = useState(getCurrentDay());
-    const active: null | number = !isLoading && data && currentDay === getCurrentDay() ? getActiveForWeek(data, currentDay) : null;
+    const [active, setActive] = useState(!isLoading && data && currentDay === getCurrentDay() ? getActiveForWeek(data, currentDay) : null);
+    useEffect(() => {
+        setInterval(() => {
+            const now = !isLoading && data && currentDay === getCurrentDay() ? getActiveForWeek(data, currentDay) : null;
+            if (now !== active) {
+                setActive(now);
+            }    
+        }, 5000);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [data]);
     if (error) {
         return (<>There was an error while fetching data!</>)
     }

@@ -1,4 +1,4 @@
-import {useContext} from 'react';
+import {useContext, useState, useEffect} from 'react';
 import { SettingsContext } from '../shared/SettingsProvider';
 import styled from 'styled-components';
 import {Footer} from '../shared/Footer';
@@ -11,7 +11,16 @@ import { getActive } from '../../utils/active';
 const TodayPage = (props: any) => {
     const settings = useContext(SettingsContext);
     const {isLoading, error, data} = useQuery('today', () => getLessonsForToday(settings));
-    const active: null | number = !isLoading && data ? getActive(data) : null;
+    const [active, setActive] = useState(!isLoading && data ? getActive(data) : null);
+    useEffect(() => {
+        setInterval(() => {
+            const now = !isLoading && data ? getActive(data) : null;
+            if (now !== active) {
+                setActive(now);
+            }
+        }, 5000);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [data]);
     if (error) {
         return (<>There was an error while fetching data!</>)
     }

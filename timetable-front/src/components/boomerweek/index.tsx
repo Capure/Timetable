@@ -1,4 +1,4 @@
-import {useContext} from 'react';
+import {useContext, useState, useEffect} from 'react';
 import styled from 'styled-components';
 import { SettingsContext } from '../shared/SettingsProvider';
 import { Footer } from '../shared/Footer';
@@ -13,10 +13,19 @@ import { getActiveForWeek } from '../../utils/active';
 const BoomerWeek = (props: any) => {
     const settings = useContext(SettingsContext);
     const {isLoading, error, data} = useQuery('week', () => getLessonsForTheWeek(settings));
+    const [active, setActive] = useState(!isLoading && data ? getActiveForWeek(data, getCurrentDay()) : null);
+    useEffect(() => {
+        setInterval(() => {
+            const now = !isLoading && data ? getActiveForWeek(data, getCurrentDay()) : null;
+            if (now !== active) {
+                setActive(now);
+            }
+        } , 5000);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [data]);
     if (error) {
         return (<>There was an error while fetching data!</>)
     }
-    const active: null | number = !isLoading && data ? getActiveForWeek(data, getCurrentDay()) : null;
     const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
     const boomerWeekContents = (<>
     {
