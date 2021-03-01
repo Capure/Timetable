@@ -1,0 +1,13 @@
+version: '3.1'
+
+services:
+    back:
+        build: .
+        ports:
+            - 5000:5000
+        restart: always
+    front:
+        build: ./timetable-front/.
+        ports:
+        - 8080:8080
+        restart: always
