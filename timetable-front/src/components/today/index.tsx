@@ -13,11 +13,15 @@ const TodayPage = (props: any) => {
     const {isLoading, error, data} = useQuery('today', () => getLessonsForToday(settings));
     const [active, setActive] = useState(!isLoading && data ? getActive(data) : null);
     useEffect(() => {
-        setInterval(() => {
+        const refreshActive = () => {
             const now = !isLoading && data ? getActive(data) : null;
             if (now !== active) {
                 setActive(now);
             }
+        }
+        refreshActive();
+        setInterval(() => {
+            refreshActive();
         }, 5000);
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data]);

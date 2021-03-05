@@ -16,13 +16,17 @@ const WeekPage = (props: any) => {
     const settings = useContext(SettingsContext);
     const {isLoading, error, data} = useQuery('week', () => getLessonsForTheWeek(settings));
     const [currentDay, setCurrentDay] = useState(getCurrentDay());
-    const [active, setActive] = useState(!isLoading && data && currentDay === getCurrentDay() ? getActiveForWeek(data, currentDay) : null);
+    const [active, setActive] = useState(!isLoading && data && currentDay === getCurrentDay() ? {idx: getActiveForWeek(data, currentDay), day: getCurrentDay()} : null);
     useEffect(() => {
-        setInterval(() => {
+        const refreshActive = () => {
             const now = !isLoading && data && currentDay === getCurrentDay() ? getActiveForWeek(data, currentDay) : null;
             if (now !== active) {
-                setActive(now);
-            }    
+                setActive({idx: now, day: getCurrentDay()});
+            }
+        }
+        refreshActive();
+        setInterval(() => {
+            refreshActive();
         }, 5000);
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data]);
@@ -34,7 +38,7 @@ const WeekPage = (props: any) => {
             <CircularProgress color="inherit" />
         :
             <Lessons>
-                {(data?.lessons as any)[currentDay].map((lesson: LessonDTO, idx: number) => (<Lesson key={idx} active={active ? active === idx ? true : null : null} title={lesson.name.length < 16 ? lesson.name : lesson.short} time={lesson.time} />))}
+                {(data?.lessons as any)[currentDay].map((lesson: LessonDTO, idx: number) => (<Lesson key={idx} active={active ? active.idx === idx && active.day === currentDay ? true : null : null} title={lesson.name.length < 16 ? lesson.name : lesson.short} time={lesson.time} />))}
                 {(data?.lessons as any)[currentDay].length === 0 ? (<Text>There are no lessons on {currentDay}.</Text>) : ""}
             </Lessons>
         }
