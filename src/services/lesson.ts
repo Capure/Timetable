@@ -75,7 +75,7 @@ export class LessonService {
     
     public async getLessonsForTheWeek({ angInf, wf, lang, filter }: { angInf: string, wf: string, lang: string, filter: boolean }): Promise<WeekDTO> {
         const week = this.getWeek();
-        const lessons = await this.client.getLessons(week[0], new Date(new Date().setDate(week[week.length - 1].getDate() + 1)));
+        const lessons = await this.client.getLessons(week[0], new Date(new Date().setDate(week[0].getDate() + 7))); // Quick fix
         const lessonsRaw = filter ? await this.filterLessons(lessons, {angInf, wf, lang}) : lessons;
         const lessonsByDay = lessonsRaw.sort((a: Lesson, b: Lesson) => a.date && b.date ? a.date?.timestamp - b.date?.timestamp : 0)
         .reduce<{ days: Array<Array<Lesson>>, current: number }>((accu: { days: Array<Array<Lesson>>, current: number }, item: Lesson) => {
@@ -105,6 +105,9 @@ export class LessonService {
         }).map(day => {
             return this.sortLessons(day);
         });
+        while (lessonDTOArray.length < 5) {
+            lessonDTOArray.push([]);
+        }
         return {
             monday: lessonDTOArray[0],
             tuesday: lessonDTOArray[1],
